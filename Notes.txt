@@ -1,0 +1,29 @@
+View Databases
+-- \l
+
+Create Database
+-- CREATE DATABASE practice;
+
+
+
+
+
+Tables
+
+Drivers         Stores             Time Frame
+id              id                 Store ID
+First Name      Store Name         Customer Name
+Last Name       Email Address      Driver
+Nickname                           Town
+                                   Order Number
+                                   Order Date
+                                   Time Frame
+                                   Store Name
+                                   
+
+
+Create Tables
+CREATE TABLE drivers(
+    id INT,
+    name VARCHAR(50)
+);
