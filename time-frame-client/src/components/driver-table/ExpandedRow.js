@@ -11,7 +11,7 @@ const timeFrames = [
         timeFrame: '11 - 2'
     },
     {
-        id: 1,
+        id: 2,
         storeName: 'KandP',
         customerName: 'Barbieri',
         town: 'Town',
@@ -19,7 +19,7 @@ const timeFrames = [
         timeFrame: '8 - 2'
     },
     {
-        id: 1,
+        id: 3,
         storeName: 'Elantech',
         customerName: 'Hajee',
         town: 'Town',
@@ -27,7 +27,7 @@ const timeFrames = [
         timeFrame: '9 - 1'
     },
     {
-        id: 1,
+        id: 4,
         storeName: 'Mr. Jays',
         customerName: 'Bloomfield',
         town: 'Town',
@@ -35,7 +35,7 @@ const timeFrames = [
         timeFrame: '10 - 12'
     },
     {
-        id: 1,
+        id: 5,
         storeName: 'Giuseppe',
         customerName: 'Lawrence',
         town: 'Town',

@@ -1,6 +1,6 @@
 import { Navbar, Container, Nav } from 'react-bootstrap';
 
-const NestedNavBar = () => {
+const NestedNavBar = ( {handleShow} ) => {
     
     return (
         <div>
