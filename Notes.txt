@@ -27,3 +27,6 @@ CREATE TABLE drivers(
     id INT,
     name VARCHAR(50)
 );
+
+
+DRIVER -> TIME FRAME -> STORE

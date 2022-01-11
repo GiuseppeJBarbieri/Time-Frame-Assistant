@@ -15,7 +15,7 @@ const TimeFrameModel = () => {
      *
      * {@param updateData} is use to "save" or update the data by notifying parent of state change
      */
-    const { data, updateData } = props;
+    // const { data, updateData } = storeName;
 
     const [showAddTimeFrame, setShowAddTimeFrame] = useState(false)
 
@@ -23,11 +23,11 @@ const TimeFrameModel = () => {
 
     const handleClose = () => {
         setShowAddTimeFrame(false);
-        console.log({ storeName: modalState.storeName, customerName: modalState.customerName, town: modalState.town, orderNumber: modalState.orderNumber, timeFrame: modalState.timeFrame })
+        // console.log({ storeName: modalState.storeName, customerName: modalState.customerName, town: modalState.town, orderNumber: modalState.orderNumber, timeFrame: modalState.timeFrame })
     }
 
     const handleNext = () => {
-        console.log({ storeName: modalState.storeName, customerName: modalState.customerName, town: modalState.town, orderNumber: modalState.orderNumber, timeFrame: modalState.timeFrame })
+        // console.log({ storeName: modalState.storeName, customerName: modalState.customerName, town: modalState.town, orderNumber: modalState.orderNumber, timeFrame: modalState.timeFrame })
         // Store this info into db
     }
 
@@ -42,40 +42,40 @@ const TimeFrameModel = () => {
                     id='storeName'
                     type='text'
                     placeholder='Store Name'
-                    value={modalState.storeName}
-                    onChange={(event) => setModalState({ ...modalState, storeName: event.target.value })}
+                    // value={modalState.storeName}
+                    // onChange={(event) => setModalState({ ...modalState, storeName: event.target.value })}
                     defaultValue={''}
                 />
                 <input
                     id='customerName'
                     type='text'
                     placeholder='Customer Name'
-                    value={modalState.customerName}
-                    onChange={(event) => setModalState({ ...modalState, customerName: event.target.value })}
+                    // value={modalState.customerName}
+                    // onChange={(event) => setModalState({ ...modalState, customerName: event.target.value })}
                     defaultValue={''}
                 />
                 <input
                     id='town'
                     type='text'
                     placeholder='Town'
-                    value={modalState.town}
-                    onChange={(event) => setModalState({ ...modalState, town: event.target.value })}
+                    // value={modalState.town}
+                    // onChange={(event) => setModalState({ ...modalState, town: event.target.value })}
                     defaultValue={''}
                 />
                 <input
                     id='orderNumber'
                     type='text'
                     placeholder='Order Number'
-                    value={modalState.orderNumber}
-                    onChange={(event) => setModalState({ ...modalState, orderNumber: event.target.value })}
+                    // value={modalState.orderNumber}
+                    // onChange={(event) => setModalState({ ...modalState, orderNumber: event.target.value })}
                     defaultValue={''}
                 />
                 <input
                     id='timeFrame'
                     type='text'
                     placeholder='Time Frame'
-                    value={modalState.timeFrame}
-                    onChange={(event) => setModalState({ ...modalState, timeFrame: event.target.value })}
+                    // value={modalState.timeFrame}
+                    // onChange={(event) => setModalState({ ...modalState, timeFrame: event.target.value })}
                     defaultValue={''}
                 />
 
@@ -96,7 +96,7 @@ const TimeFrameModel = () => {
                      * Sending edited data back upstream the DOM to parent (app.js in this case)
                      * to later be send back downstream to this module's sibling. (Table..ExpandedRow)
                      */
-                    updateData(data);
+                    // updateData(data);
                 }}>
                     Add Time Frame
 
@@ -104,14 +104,24 @@ const TimeFrameModel = () => {
                 <hr />
                 <Button variant="primary" onClick={() => {
                     // Form validation here
-                    modalState.storeName && modalState.customerName && modalState.town && modalState.timeFrame && handleClose();
+                   // storeName && customerName && town && timeFrame && handleClose();
                 }}>
                     Finish Time Frames
                 </Button>
             </div>
         </Modal>
     )
-}
+} 
 
 export default TimeFrameModel
 
+/* 2 ways
+Send data from component back to parent
+
+Send add request to database
+
+Send an event back to parent
+
+
+export default TimeFrameModel
+*/
