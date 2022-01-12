@@ -18,9 +18,9 @@ const standardError = (message: string) => {
 };
 
 export default {
-  async Add(driverName: string): Promise<IDriver> {
+  async Add(driver): Promise<IDriver> {
     try {
-      return await db.Drivers.create(driverName);
+      return await db.Drivers.create(driver);
     } catch (err) {
       standardError(`${err.name} ${err.message}`);
       throw repoErr;

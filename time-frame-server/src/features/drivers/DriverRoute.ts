@@ -17,7 +17,7 @@ const router = express.Router();
 router.post('/', authenticationMiddleware, validate(DriverValidation.PostDriver),
   (req, res, next) => {
     logger.info('POST Driver');
-    DriverController.Add(req.body.name)
+    DriverController.Add(req.body)
       .then((response) => {
         res.status(201).json(response);
       })

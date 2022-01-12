@@ -3,13 +3,13 @@ import * as Joi from 'joi';
 export default {
   PostDriver: {
     body: {
-      name: Joi.string().required(),
+      name: Joi.string(),
     },
   },
 
   GetDriver: {
     params: {
-      id: Joi.number().required(),
+      driverId: Joi.number().required(),
     },
   },
 

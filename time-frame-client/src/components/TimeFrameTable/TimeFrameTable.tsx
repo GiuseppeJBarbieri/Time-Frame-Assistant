@@ -15,7 +15,6 @@ import { Spinner } from 'react-bootstrap';
 import IDriver from '../../types/IDriver';
 import { Plus } from 'react-bootstrap-icons';
 import { AddTimeFrameModal } from '../AddTimeFrameModal/AddTimeFrameModal';
-import moment from 'moment';
 
 interface TimeFrameTableProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> {
     data: IDriver[];

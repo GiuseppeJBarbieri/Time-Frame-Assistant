@@ -1,6 +1,7 @@
 import DriverRepository from './DriverRepository';
 import constants from '../../utils/constants/Constants';
 import IHTTPResponse from '../../utils/interfaces/IHTTPResponse';
+import IDriver from './IDriver';
 
 export default {
   /**
@@ -8,13 +9,14 @@ export default {
    * @param user The user to add
    * @returns {PromiseLike<>}
    */
-  async Add(driverName: string): Promise<IHTTPResponse> {
+  async Add(driver: IDriver): Promise<IHTTPResponse> {
     try {
-      const driver = await DriverRepository.Add(driverName);
+      let _driver = { ...driver };
+      _driver = await DriverRepository.Add(_driver);
 
       return {
         ...constants.HTTP.SUCCESS.CREATED,
-        id: driver.driverId,
+        id: _driver.driverId,
       };
     } catch (err) {
       return Promise.reject(err);
