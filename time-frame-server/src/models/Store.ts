@@ -1,14 +1,9 @@
 import { Model } from 'sequelize';
-
-interface StoreAttributes {
-    storeId: number;
-    storeName: string;
-    emailAddress: string;
-}
+import IStore from '../features/stores/IStore';
 
 export default (sequelize: any, DataTypes: any) => {
-  class Store extends Model<StoreAttributes>
-    implements StoreAttributes {
+  class Store extends Model<IStore>
+    implements IStore {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.

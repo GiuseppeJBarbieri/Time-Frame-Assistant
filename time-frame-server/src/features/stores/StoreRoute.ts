@@ -17,7 +17,7 @@ const router = express.Router();
 router.post('/', authenticationMiddleware, validate(StoreValidation.PostStore),
   (req, res, next) => {
     logger.info('POST Store');
-    StoreController.Add(req.body.name, req.body.emailAddress)
+    StoreController.Add(req.body)
       .then((response) => {
         res.status(201).json(response);
       })
@@ -43,6 +43,19 @@ router.get('/', authenticationMiddleware, validate(StoreValidation.GetAllStores)
 
   StoreController.GetAll()
     .then((stores) => res.status(200).json(stores))
+    .catch((err) => next(err));
+});
+
+/**
+ * This route will delete store by id
+ */
+router.delete('/:storeId', authenticationMiddleware, validate(StoreValidation.RemoveStoreById), (req, res, next) => {
+  logger.info('DELETE Store');
+
+  StoreController.RemoveById(Number(req.params.storeId))
+    .then((response) => {
+      res.status(201).json(response);
+    })
     .catch((err) => next(err));
 });
 

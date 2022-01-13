@@ -18,9 +18,9 @@ const standardError = (message: string) => {
 };
 
 export default {
-  async Add(storeName: string, emailAddress: string): Promise<IStore> {
+  async Add(store): Promise<IStore> {
     try {
-      return await db.Stores.create(storeName, emailAddress);
+      return await db.Stores.create(store);
     } catch (err) {
       standardError(`${err.name} ${err.message}`);
       throw repoErr;
@@ -47,4 +47,14 @@ export default {
     }
   },
 
+  async RemoveById(storeId: number): Promise<IStore[]> {
+    try {
+      return await db.Stores.destroy({
+        where: { storeId },
+      });
+    } catch (err) {
+      standardError(`${err.name} ${err.message}`);
+      return Promise.reject(repoErr);
+    }
+  },
 };

@@ -4,6 +4,7 @@ import IHTTPResponse from '../../utils/interfaces/IHTTPResponse';
 import IDriver from './IDriver';
 
 export default {
+
   /**
    * This function will add the given user
    * @param user The user to add
@@ -43,6 +44,18 @@ export default {
       return {
         ...constants.HTTP.SUCCESS.SELECTED,
         payload: [...drivers],
+      };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+
+  async RemoveById(driverId: number) {
+    try {
+      const affectedRowCount = await DriverRepository.RemoveById(driverId);
+      return {
+        ...constants.HTTP.SUCCESS.DELETE,
+        payload: affectedRowCount,
       };
     } catch (err) {
       return Promise.reject(err);

@@ -8,41 +8,63 @@ import { BASE_API_URL } from '../../constants/API';
 import IDriver from '../../types/IDriver';
 import axios from 'axios';
 import './Drivers.css';
-import { driver } from 'localforage';
 
 interface DriversProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> { }
 
 export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
   const [driverTableState, setDriverTableState] = useState<{ data: IDriver[], isPending: boolean }>({ data: [], isPending: true });
-  const [open, setOpen] = useState(false);
+  const [actionRowVisible, setActionRowVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const [driver, setDriver] = useState<IDriver>({ driverId: 0, name: '' });
 
   const addDriver = () => {
     setIsSaving(true);
-    axios.post(`${BASE_API_URL}drivers`, driver, { withCredentials: true })
-      .then((response) => {
-        setIsSaving(false);
-        setDriver({ name: '' });
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsSaving(false);
-      });
-  }
+    setTimeout(() => {
+      const _driver = {...driver};
+      delete _driver.driverId;
+      axios.post(`${BASE_API_URL}drivers`, _driver, { withCredentials: true })
+        .then((response) => {
+          setIsSaving(false);
+          setDriver({ driverId: 0, name: '' });
+          getDrivers();
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsSaving(false);
+        });
+    }, 400);
+  };
 
-  useEffect(() => {
+  const getDrivers = () => {
     setTimeout(() => {
       axios.get(`${BASE_API_URL}drivers`, { withCredentials: true })
         .then((response) => {
+          setIsSaving(false);
           setDriverTableState({ data: response?.data?.payload, isPending: false });
         })
         .catch((err) => {
           console.log(err);
         });
     }, 400);
+  };
+
+  const onDriverRemoved = (driverId: number) => {
+    setTimeout(() => {
+      axios.delete(`${BASE_API_URL}drivers/${driverId}`, { withCredentials: true })
+        .then((response) => {
+          setIsSaving(false);
+          getDrivers();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 400);
+  };
+
+  useEffect(() => {
+    getDrivers();
   }, []);
+
   return (
     <section className="text-white main-section overflow-auto">
       <div style={{ padding: 20 }}>
@@ -57,34 +79,32 @@ export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
           <Button
             className='btn btn-dark'
             style={{ height: 38 }}
-            onClick={() => setOpen(!open)}
+            onClick={() => setActionRowVisible(!actionRowVisible)}
             aria-controls="collapse-btns"
-            aria-expanded={open}
+            aria-expanded={actionRowVisible}
           >
             Add Driver
           </Button>
-          <Fade in={open}>
+          <Fade in={actionRowVisible}>
             <div id="example-fade-text flex">
               <form className='container d-flex' style={{ 'maxWidth': 400 }}>
-
-                <input type='text' className="form-control" placeholder="Driver Name" onChange={(e) => setDriver({ name: e.target.value })} style={{ 'marginBottom': 15, 'textAlign': 'center', height: 36, marginTop: 1 }} />
-
+                <input type='text' 
+                className="form-control custom-input" 
+                placeholder="Driver Name" 
+                value={driver.name} onChange={(e) => setDriver({ ...driver, name: e.target.value })} 
+                />
                 <Button
                   className='btn btn-dark'
                   style={{ height: 38, marginLeft: 5 }}
                   aria-controls="collapse-btns"
-                  aria-expanded={open}
+                  aria-expanded={actionRowVisible}
                   onClick={async () => {
-                    // setOpen(!open)
+                    setActionRowVisible(!actionRowVisible)
                     addDriver()
-                    window.location.reload();
-                  }
-                  }
+                  }}
                 >
                   Add
                 </Button>
-
-
               </form>
             </div>
           </Fade>
@@ -103,7 +123,7 @@ export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
               </ul>
             </div>
             :
-            <DriverTable data={driverTableState.data} isPending={driverTableState.isPending} />
+            <DriverTable data={driverTableState.data} isPending={driverTableState.isPending} onDriverRemoved={onDriverRemoved} />
           }
         </div>
       </div>

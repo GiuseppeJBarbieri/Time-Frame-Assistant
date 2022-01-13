@@ -46,4 +46,15 @@ export default {
       return Promise.reject(repoErr);
     }
   },
+
+  async RemoveById(driverId: number): Promise<IDriver[]> {
+    try {
+      return await db.Drivers.destroy({
+        where: { driverId },
+      });
+    } catch (err) {
+      standardError(`${err.name} ${err.message}`);
+      return Promise.reject(repoErr);
+    }
+  },
 };

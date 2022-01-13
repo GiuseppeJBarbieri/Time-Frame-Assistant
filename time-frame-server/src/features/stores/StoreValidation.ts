@@ -3,8 +3,8 @@ import * as Joi from 'joi';
 export default {
   PostStore: {
     body: {
-      name: Joi.string().required(),
-      emailAddress: Joi.string().required(),
+      storeName: Joi.string(),
+      emailAddress: Joi.string(),
     },
   },
 
@@ -20,6 +20,12 @@ export default {
     },
     body: {
 
+    },
+  },
+
+  RemoveStoreById: {
+    params: {
+      storeId: Joi.number().required(),
     },
   },
 

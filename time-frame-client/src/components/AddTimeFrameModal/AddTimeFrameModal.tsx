@@ -1,7 +1,6 @@
 import axios from "axios";
-import moment from "moment";
 import React, { HTMLAttributes, FunctionComponent, useEffect, useState } from "react";
-import { Modal, Button, Dropdown, Form, Spinner } from "react-bootstrap";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import { ArrowDown } from "react-bootstrap-icons";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { BASE_API_URL } from "../../constants/API";

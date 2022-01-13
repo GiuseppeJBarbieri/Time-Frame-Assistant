@@ -193,6 +193,3 @@ const ExpandedRowComponent: FunctionComponent<ExpandedRowProps> = ({ history }) 
 
 export const ExpandedRow = withRouter(ExpandedRowComponent);
 
-function cellEditFactory(arg0: { mode: string; }): any {
-    console.log('edit');
-}

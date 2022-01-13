@@ -5,40 +5,20 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import BootstrapTable from 'react-bootstrap-table-next';
 
-import ToolkitProvider, { ColumnToggle } from 'react-bootstrap-table2-toolkit';
-
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import './DriverTable.css';
 import IDriver from '../../types/IDriver';
 import { Spinner } from 'react-bootstrap';
-import { Pencil, Trash } from 'react-bootstrap-icons';
+import { Trash } from 'react-bootstrap-icons';
 
 interface DriverTableProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> {
     data: IDriver[];
     isPending: boolean;
+    onDriverRemoved: (driverId: number) => void;
 }
 
-const DriverTableComponent: FunctionComponent<DriverTableProps> = ({ history, data, isPending }) => {
-    const { SearchBar } = Search;
-
-    const rankFormatterEdit = () => {
-        return (
-            <div
-                style={{
-                    cursor: 'pointer',
-                    lineHeight: 'normal',
-                    textAlign: 'center'
-                }}
-            >
-    
-                <Pencil
-                    style={{ fontSize: 20, color: 'white' }}
-                />
-            </div>
-        );
-    
-    };
-    const rankFormatterRemove = () => {
+const DriverTableComponent: FunctionComponent<DriverTableProps> = ({ history, data, isPending, onDriverRemoved }) => {
+    const rankFormatterRemove = (_: any, data: any, index: any) => {
         return (
             <div
                 style={{
@@ -46,39 +26,31 @@ const DriverTableComponent: FunctionComponent<DriverTableProps> = ({ history, da
                     cursor: 'pointer',
                     lineHeight: 'normal',
                 }}
+                onClick={() => onDriverRemoved(data.driverId)}
             >
-    
-                <Trash
-                    style={{ fontSize: 20, color: 'white' }}
-                />
+                <Trash style={{ fontSize: 20, color: 'white' }} />
             </div>
         );
-    
+
     };
-    const columns = [
+
+    const column = [
         {
             id: 1,
             dataField: "driverId",
-            text: "Driver ID",
-            sort: true
+            text: "ID",
+            sort: true,
+            headerAttrs: { width: 100 },
+            attrs: { width: 100 }
         },
         {
             id: 2,
             dataField: "name",
             text: "Name",
             sort: true
-        }, ,
-        {
-            id: 3,
-            dataField: "editStore",
-            text: "Edit",
-            sort: false,
-            formatter: rankFormatterEdit,
-            headerAttrs: { width: 50 },
-            attrs: { width: 50 }
         },
         {
-            id: 4,
+            id: 3,
             dataField: "removeStore",
             text: "Remove",
             sort: false,
@@ -87,6 +59,7 @@ const DriverTableComponent: FunctionComponent<DriverTableProps> = ({ history, da
             attrs: { width: 75 }
         }
     ];
+    
     return (
         <div>
             {isPending ?
@@ -102,40 +75,16 @@ const DriverTableComponent: FunctionComponent<DriverTableProps> = ({ history, da
                 </div>
                 :
                 <div>
-                    <ToolkitProvider
+                    <hr />
+                    <BootstrapTable
+                        key='driversTbl'
+                        bootstrap4
+                        columns={column}
                         keyField="driverId"
                         data={data}
-                        columns={columns}
-                        search
-                    >
-                        {
-                            (props: { searchProps: JSX.IntrinsicAttributes, baseProps: any }) => (
-                                <div>
-                                    <div style={{ textAlign: 'end' }}>
-                                        <div>
-                                            <SearchBar
-                                                style={{ textAlign: 'center' }}
-                                                {...props.searchProps}
-                                                srText=""
-                                                placeholder="Search Driver"
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <BootstrapTable
-                                        key='driversTbl'
-                                        {...props.baseProps}
-                                        bootstrap4
-                                        keyField="driverId"
-                                        data={data}
-                                        columns={columns}
-                                        classes="table table-dark table-condensed table-hover table-striped"
-                                        pagination={paginationFactory({ sizePerPage: 30 })}
-                                    />
-                                </div>
-                            )
-                        }
-                    </ToolkitProvider>
+                        classes="table table-dark table-condensed table-hover table-striped"
+                        pagination={paginationFactory({ sizePerPage: 10 })}
+                    />
                 </div>
             }
         </div >

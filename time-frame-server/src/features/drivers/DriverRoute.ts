@@ -27,7 +27,7 @@ router.post('/', authenticationMiddleware, validate(DriverValidation.PostDriver)
 /**
  * This route will fetch a driver by id
  */
-router.get('/:id', authenticationMiddleware, validate(DriverValidation.GetDriver), (req, res, next) => {
+router.get('/:driverId', authenticationMiddleware, validate(DriverValidation.GetDriver), (req, res, next) => {
   logger.info('GET Driver');
 
   DriverController.GetById(Number(req.params.id))
@@ -46,4 +46,16 @@ router.get('/', authenticationMiddleware, validate(DriverValidation.GetAllDriver
     .catch((err) => next(err));
 });
 
+/**
+ * This route will delete driver by id
+ */
+router.delete('/:driverId', authenticationMiddleware, validate(DriverValidation.RemoveDriverById), (req, res, next) => {
+  logger.info('DELETE Driver');
+
+  DriverController.RemoveById(Number(req.params.driverId))
+    .then((response) => {
+      res.status(201).json(response);
+    })
+    .catch((err) => next(err));
+});
 export default router;

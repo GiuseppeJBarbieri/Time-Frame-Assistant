@@ -22,4 +22,10 @@ export default {
     },
   },
 
+  RemoveDriverById: {
+    params: {
+      driverId: Joi.number().required(),
+    },
+  },
+
 };

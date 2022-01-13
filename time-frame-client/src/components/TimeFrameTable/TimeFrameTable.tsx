@@ -5,9 +5,6 @@ import { ExpandedRow } from './ExpandedRow';
 import paginationFactory from "react-bootstrap-table2-paginator";
 import BootstrapTable from 'react-bootstrap-table-next';
 
-// @ts-ignore
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import './TimeFrameTable.css';
 // import ITimeFrame from '../../types/ITimeFrame';
@@ -30,11 +27,10 @@ export const productsGenerator = (quantity: number) => {
     return items;
 };
 
-const defaultModalState = {selectedDriver: {}, modalVisible: false, selectedDate: ''};
+const defaultModalState = { selectedDriver: {}, modalVisible: false, selectedDate: '' };
 
 const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ history, data, isPending, date }) => {
-    const { SearchBar } = Search;
-    const [modalState, setModalState] = useState<{modalVisible: boolean, selectedDriver: IDriver, selectedDate: string}>(defaultModalState);
+    const [modalState, setModalState] = useState<{ modalVisible: boolean, selectedDriver: IDriver, selectedDate: string }>(defaultModalState);
 
     const rankFormatter = (_: any, data: any, index: any) => {
         return (
@@ -48,7 +44,7 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
                 onClick={(e) => { e.stopPropagation() }}
             >
                 <div onClick={(e) => {
-                    setModalState({modalVisible: true, selectedDriver: data, selectedDate: date});
+                    setModalState({ modalVisible: true, selectedDriver: data, selectedDate: date });
                 }
                 }>
                     <Plus
@@ -98,47 +94,23 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
                 </div>
                 :
                 <div>
-                    <ToolkitProvider
+                    <hr />
+                    <BootstrapTable
+                        key='driversTbl'
+                        bootstrap4
                         keyField="driverId"
                         data={data}
                         columns={columns}
-                        search
-                    >
-                        {
-                            (props: { searchProps: JSX.IntrinsicAttributes, baseProps: any }) => (
-                                <div>
-                                    <div style={{ textAlign: 'end' }}>
-                                        <div>
-                                            <SearchBar
-                                                style={{ textAlign: 'center' }}
-                                                {...props.searchProps}
-                                                srText=""
-                                                placeholder="Search Driver"
-                                            />
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <BootstrapTable
-                                        key='driversTbl'
-                                        {...props.baseProps}
-                                        bootstrap4
-                                        keyField="driverId"
-                                        data={data}
-                                        columns={columns}
-                                        classes="table table-dark table-condensed table-hover table-striped"
-                                        expandRow={{
-                                            onlyOneExpanding: true,
-                                            renderer: row => (
-                                                <ExpandedRow />
+                        classes="table table-dark table-condensed table-hover table-striped"
+                        expandRow={{
+                            onlyOneExpanding: true,
+                            renderer: row => (
+                                <ExpandedRow />
 
-                                            )
-                                        }}
-                                        pagination={paginationFactory({ sizePerPage: 4 })}
-                                    />
-                                </div>
                             )
-                        }
-                    </ToolkitProvider>
+                        }}
+                        pagination={paginationFactory({ sizePerPage: 4 })}
+                    />
                 </div>
             }
             {

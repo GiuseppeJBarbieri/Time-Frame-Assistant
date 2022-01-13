@@ -23,3 +23,9 @@
   width: -webkit-fill-available;
   border-radius: 5px;
 }
+.custom-input {
+  margin-bottom: 15px;
+  text-align: center;
+  height: 36;
+  margin-top: 1;
+}

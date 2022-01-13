@@ -1,6 +1,7 @@
 import StoreRepository from './StoreRepository';
 import constants from '../../utils/constants/Constants';
 import IHTTPResponse from '../../utils/interfaces/IHTTPResponse';
+import IStore from './IStore';
 
 export default {
   /**
@@ -8,13 +9,14 @@ export default {
    * @param user The user to add
    * @returns {PromiseLike<>}
    */
-  async Add(storeName: string, emailAddress: string): Promise<IHTTPResponse> {
+  async Add(store: IStore): Promise<IHTTPResponse> {
     try {
-      const store = await StoreRepository.Add(storeName, emailAddress);
+      let _store = { ...store };
+      _store = await StoreRepository.Add(_store);
 
       return {
         ...constants.HTTP.SUCCESS.CREATED,
-        id: store.storeId,
+        id: _store.storeId,
       };
     } catch (err) {
       return Promise.reject(err);
@@ -41,6 +43,18 @@ export default {
       return {
         ...constants.HTTP.SUCCESS.SELECTED,
         payload: [...stores],
+      };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+
+  async RemoveById(storeId: number) {
+    try {
+      const affectedRowCount = await StoreRepository.RemoveById(storeId);
+      return {
+        ...constants.HTTP.SUCCESS.DELETE,
+        payload: affectedRowCount,
       };
     } catch (err) {
       return Promise.reject(err);

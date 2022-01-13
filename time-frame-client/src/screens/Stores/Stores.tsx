@@ -2,7 +2,7 @@ import * as React from 'react';
 import { FunctionComponent, HTMLAttributes, useEffect } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { useState } from 'react';
-import { Button, Fade } from 'react-bootstrap';
+import { Button, Fade, Spinner } from 'react-bootstrap';
 import { StoreTable } from '../../components/StoreTable/StoreTable';
 import { BASE_API_URL } from '../../constants/API';
 import axios from 'axios';
@@ -16,7 +16,30 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
   const [storeTableState, setStoreTableState] = useState<{ data: IStore[], isPending: boolean }>({ data: [], isPending: true });
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
+  const [isSaving, setIsSaving] = useState(false);
+  const [store, setStore] = useState<IStore>({ storeId: 0, storeName: '', emailAddress: '' });
+
+  const addStore = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      // Trimming out store id b/c validation doesn't require
+      const _store = {...store};
+      delete _store.storeId;
+      
+      axios.post(`${BASE_API_URL}stores`, _store, { withCredentials: true })
+        .then((response) => {
+          setIsSaving(false);
+          setStore({ storeId: 0, storeName: '', emailAddress: '' });
+          getStores();
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsSaving(false);
+        });
+    }, 400);
+  };
+
+  const getStores = () => {
     setTimeout(() => {
       axios.get(`${BASE_API_URL}stores`, { withCredentials: true })
         .then((response) => {
@@ -26,6 +49,21 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
           console.log(err);
         });
     }, 400);
+  };
+  const onStoreRemoved = (storeId: number) => {
+    setTimeout(() => {
+      axios.delete(`${BASE_API_URL}stores/${storeId}`, { withCredentials: true })
+        .then((response) => {
+          setIsSaving(false);
+          getStores();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 400);
+  };
+  useEffect(() => {
+    getStores();
   }, []);
   return (
     <section className="text-white main-section overflow-auto">
@@ -50,30 +88,59 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
             <div id="example-fade-text flex">
               <form className='container d-flex' style={{ 'maxWidth': 400 }}>
 
-                <input type='text' className="form-control" placeholder="Store Name" style={{ 'marginBottom': 15, 'textAlign': 'center', height: 36, marginTop: 1 }} />
-                <input type='email' className="form-control" placeholder="Email Address" style={{ 'marginBottom': 15, 'textAlign': 'center', height: 36, marginTop: 1, marginLeft: 5 }} />
+                <input
+                  type='text'
+                  className="form-control"
+                  placeholder="Store Name"
+                  value={store.storeName}
+                  onChange={(e) => setStore({ ...store, storeName: e.target.value })}
+                  style={{ 'marginBottom': 15, 'textAlign': 'center', height: 36, marginTop: 1 }}
+                />
+                <input
+                  type='text'
+                  className="form-control"
+                  placeholder="Email Address"
+                  value={store.emailAddress}
+                  onChange={(e) => setStore({ ...store, emailAddress: e.target.value })}
+                  style={{ 'marginBottom': 15, 'textAlign': 'center', height: 36, marginTop: 1, marginLeft: 5 }}
+                />
 
                 <Button
                   className='btn btn-dark'
                   style={{ height: 38, marginLeft: 5 }}
-                  onClick={() => setOpen(!open)}
                   aria-controls="collapse-btns"
                   aria-expanded={open}
+                  onClick={async () => {
+                    setOpen(!open)
+                    addStore()
+                  }}
                 >
                   Add
                 </Button>
-
-
               </form>
             </div>
           </Fade>
         </div>
         <br />
-        <div style={{ marginTop: -30 }} >
-          <StoreTable data={storeTableState.data} isPending={storeTableState.isPending} />
-        </div>
+        {isSaving ?
+          <div className='spinnerDiv' >
+            <ul>
+              <li key='1' style={{ listStyle: 'none' }}>
+                <Spinner animation="border" role="status" />
+              </li>
+              <li key='2' style={{ listStyle: 'none' }}>
+                <label>Loading...</label>
+              </li>
+            </ul>
+          </div>
+          :
+          <div style={{ marginTop: -30 }} >
+            <StoreTable data={storeTableState.data} isPending={storeTableState.isPending} onStoreRemoved={onStoreRemoved} />
+          </div>
+        }
+
       </div>
-    </section>
+    </section >
   );
 };
 
