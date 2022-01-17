@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import TimeFrameRepository from './TimeFrameRepository';
 import constants from '../../utils/constants/Constants';
 import IHTTPResponse from '../../utils/interfaces/IHTTPResponse';
@@ -12,14 +13,14 @@ export default {
 
   // TODO THIS
   // eslint-disable-next-line max-len
-  async Add(data:ITimeFrame): Promise<IHTTPResponse> {
-    console.log('>>>>>>>>>> Repo', data.customerName);
+  async Add(timeFrame: ITimeFrame): Promise<IHTTPResponse> {
     try {
-      const timeFrame = await TimeFrameRepository.Add(data);
+      let _timeFrame = { ...timeFrame };
+      _timeFrame = await TimeFrameRepository.Add(_timeFrame);
 
       return {
         ...constants.HTTP.SUCCESS.CREATED,
-        id: timeFrame.orderId,
+        id: _timeFrame.orderId,
       };
     } catch (err) {
       return Promise.reject(err);
@@ -39,14 +40,39 @@ export default {
     }
   },
 
-  // TODO GET ALL BY DATE
-
   async GetAll() {
     try {
       const timeFrames = await TimeFrameRepository.GetAllTimeFrames();
       return {
         ...constants.HTTP.SUCCESS.SELECTED,
         payload: [...timeFrames],
+      };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+
+  async GetByDateAndDriver(driverId: number, orderDate: Date) {
+    /**
+     * Optimize Schema associations to avoid problems below
+     * */
+    try {
+      const timeFrames = await TimeFrameRepository.GetByDriverIdAndDate(driverId, orderDate);
+      return {
+        ...constants.HTTP.SUCCESS.SELECTED,
+        payload: [...timeFrames],
+      };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+
+  async RemoveById(orderId: number) {
+    try {
+      const affectedRowCount = await TimeFrameRepository.RemoveById(orderId);
+      return {
+        ...constants.HTTP.SUCCESS.DELETE,
+        payload: affectedRowCount,
       };
     } catch (err) {
       return Promise.reject(err);

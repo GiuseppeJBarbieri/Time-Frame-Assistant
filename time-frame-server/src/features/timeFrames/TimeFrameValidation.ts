@@ -3,13 +3,13 @@ import * as Joi from 'joi';
 export default {
   PostTimeFrame: {
     body: {
-      storeId: Joi.number().required(),
-      driverId: Joi.number().required(),
-      customerName: Joi.string().required(),
-      town: Joi.string().required(),
-      orderNumber: Joi.string().required(),
-      timeFrame: Joi.string().required(),
-      orderDate: Joi.string().required(),
+      storeId: Joi.number(),
+      driverId: Joi.number(),
+      customerName: Joi.string(),
+      town: Joi.string(),
+      orderNumber: Joi.string(),
+      timeFrame: Joi.string(),
+      orderDate: Joi.string(),
     },
   },
 
@@ -19,12 +19,25 @@ export default {
     },
   },
 
+  GetTimeFramesByOrderDate: {
+    body: {
+      driverId: Joi.number(),
+      orderDate: Joi.string(),
+    },
+  },
+
   GetAllTimeFrames: {
     params: {
 
     },
     body: {
 
+    },
+  },
+
+  RemoveById: {
+    params: {
+      orderId: Joi.number().required(),
     },
   },
 

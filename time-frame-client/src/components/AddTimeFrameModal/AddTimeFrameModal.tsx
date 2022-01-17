@@ -1,7 +1,7 @@
 import axios from "axios";
+import moment from "moment";
 import React, { HTMLAttributes, FunctionComponent, useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
-import { ArrowDown } from "react-bootstrap-icons";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { BASE_API_URL } from "../../constants/API";
 import IDriver from "../../types/IDriver";
@@ -10,19 +10,25 @@ import ITimeFrame from "../../types/ITimeFrame";
 
 interface AddTimeFrameModalProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> {
     onClose: () => Promise<void>;
-    driver?: IDriver;
+    modalState: { modalVisible: boolean, selectedDriver: IDriver };
+    getTimeFrames: (driverId: number, orderDate: Date) => void;
     selectedDate: string;
 }
 
-const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = ({ history, onClose, driver, selectedDate }) => {
+const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (props) => {
     const [storeList, setStoreList] = useState<IStore[]>([]);
     const [isSaving, setIsSaving] = useState(false);
-
-    //const [storeId, setStoreId] = '';
-    const [modalInputs, setModalInputs] =
-        useState<{ storeId: number, customerName: string, town: string, orderNumber: string, timeFrame: string }>
-            ({ storeId: 0, customerName: '', town: '', orderNumber: '', timeFrame: '' });
-
+    const [timeFrame, setTimeFrame] =
+        useState<ITimeFrame>({
+            orderId: 0,
+            storeId: 0,
+            driverId: props.modalState.selectedDriver.driverId,
+            customerName: '',
+            town: '',
+            orderNumber: '',
+            timeFrame: '',
+            orderDate: new Date(props.selectedDate)
+        });
 
     useEffect(() => {
         axios.get(`${BASE_API_URL}stores`, { withCredentials: true })
@@ -33,40 +39,44 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = ({
                 console.log(err);
             });
     }, []);
+
     const addTimeFrame = async () => {
-        let result = false;
         setIsSaving(true);
-        const data:ITimeFrame = {
-            storeId: modalInputs.storeId,
-            driverId: driver?.driverId,
-            customerName: modalInputs.customerName,
-            town: modalInputs.town,
-            orderNumber: modalInputs.orderNumber,
-            timeFrame: modalInputs.timeFrame,
-            orderDate: selectedDate
-        };
-        console.log(data.customerName)
-        axios.post(`${BASE_API_URL}timeframes`, data, { withCredentials: true })
-            .then((response) => {
-                setIsSaving(false);
-                result = true;
-            })
-            .catch((err) => {
-                console.log(err);
-                setIsSaving(false);
-            });
-        return result;
+        setTimeout(() => {
+            // Trimming out store id b/c validation doesn't require
+            const _timeFrame = { ...timeFrame };
+            delete _timeFrame.orderId;
+
+            axios.post(`${BASE_API_URL}timeFrames`, _timeFrame, { withCredentials: true })
+                .then((response) => {
+                    setIsSaving(false);
+                    props.getTimeFrames(Number(props.modalState.selectedDriver.driverId), new Date(props.selectedDate));
+                    setTimeFrame({
+                        storeId: 0,
+                        customerName: '',
+                        town: '',
+                        orderNumber: '',
+                        timeFrame: ''
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setIsSaving(false);
+                });
+        }, 400);
     };
     return (
-        <Modal backdrop="static" show={true} onHide={onClose} className='bg-dark'>
+        <Modal backdrop="static" show={props.modalState.modalVisible} onHide={props.onClose} className='bg-dark'>
             <Modal.Header closeButton>
-                <Modal.Title style={{ display: 'inline-flex' }}>
-                    <h4 style={{ verticalAlign: 'middle' }} >Adding Time Frame for </h4>
-                    <h4 style={{ color: '#0d6efd', fontWeight: 500, marginLeft: 5 }}> {driver?.name}</h4>
+                <Modal.Title style={{ display: '' }}>
+                    <h4 style={{ verticalAlign: '' }} >Adding Time Frame for </h4>
+                    <h4 style={{ fontWeight: 500, marginLeft: 5 }}>{props.modalState.selectedDriver.name} on {moment(props.selectedDate).format("MM/DD/YYYY")}</h4>
+                    
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ color: 'red', fontSize: 18, fontWeight: 400 }}>
                 Please enter time frame information.
+                Date: 
             </Modal.Body>
             <div className='container d-grid gap-2' style={{ marginBottom: 15 }}>
                 {isSaving ?
@@ -86,45 +96,55 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = ({
                             <Form.Label>Store</Form.Label>
                             <select id="inputState"
                                 onChange={(e) => {
-                                    setModalInputs({ ...modalInputs, storeId: Number(e.target.value) })
+                                    setTimeFrame({ ...timeFrame, storeId: Number(e.target.value) })
                                 }}
                                 className="form-control"
                                 style={{ color: 'grey' }}
+                                value={timeFrame.storeId}
+                                placeholder="Choose Store..."
                             >
-                                <option selected>Choose Store... </option><ArrowDown />
+                                <option key='0' value={0}>Choose Store...</option>
                                 {storeList.map((store) => <option value={store.storeId}>{store.storeName}</option>)}
                             </select>
                         </div>
                         <Form.Group className="mb-3">
                             <Form.Label>Customer Name</Form.Label>
-                            <Form.Control onChange={(e) => setModalInputs({ ...modalInputs, customerName: (e.target.value) })} type="text" placeholder="Customer Name" />
+                            <Form.Control
+                                value={timeFrame.customerName} onChange={(e) => setTimeFrame({ ...timeFrame, customerName: (e.target.value) })} type="text" placeholder="Customer Name"
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Town</Form.Label>
-                            <Form.Control onChange={(e) => setModalInputs({ ...modalInputs, town: (e.target.value) })} id="town" type="text" placeholder="Town" />
+                            <Form.Control
+                                value={timeFrame.town} onChange={(e) => setTimeFrame({ ...timeFrame, town: (e.target.value) })} id="town" type="text" placeholder="Town"
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Order Number</Form.Label>
-                            <Form.Control onChange={(e) => setModalInputs({ ...modalInputs, orderNumber: (e.target.value) })} id="orderNumber" type="text" placeholder="Order Number" />
+                            <Form.Control
+                                value={timeFrame.orderNumber} onChange={(e) => setTimeFrame({ ...timeFrame, orderNumber: (e.target.value) })} id="orderNumber" type="text" placeholder="Order Number"
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Time Frame</Form.Label>
-                            <Form.Control onChange={(e) => setModalInputs({ ...modalInputs, timeFrame: (e.target.value) })} id="timeFrame" type="text" placeholder="Time Frame" />
+                            <Form.Control
+                                value={timeFrame.timeFrame} onChange={(e) => setTimeFrame({ ...timeFrame, timeFrame: (e.target.value) })} id="timeFrame" type="text" placeholder="Time Frame"
+                            />
                         </Form.Group>
-
                         <br />
                         <Button variant="primary" onClick={async () => {
-                            let result = await addTimeFrame();
-                            result &&
-                                setModalInputs({ storeId: 0, customerName: '', town: '', orderNumber: '', timeFrame: '' });
+                            addTimeFrame();
+                            isSaving &&
+                                setTimeFrame({ storeId: 0, customerName: '', town: '', orderNumber: '', timeFrame: '' });
                         }}>
                             Add Time Frame
                         </Button>
                         <hr />
                         <Button variant="primary" onClick={async () => {
-                            const result = await addTimeFrame();
-                            result &&
-                                onClose();
+                            addTimeFrame();
+                            isSaving &&
+                                props.onClose();
+                            props.modalState.modalVisible = false;
                         }}>
                             Finish Time Frames
                         </Button>

@@ -9,6 +9,6 @@ const router = express.Router();
 router.use('/users', userRouter);
 router.use('/drivers', driverRouter);
 router.use('/stores', storeRouter);
-router.use('/timeframes', timeFrameRouter);
+router.use('/timeFrames', timeFrameRouter);
 
 export default router;

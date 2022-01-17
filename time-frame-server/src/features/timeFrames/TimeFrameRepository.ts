@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import db from '../../models';
 import logger from '../../utils/logging/Logger';
 import IRepoError from '../../utils/interfaces/IRepoError';
@@ -18,11 +19,9 @@ const standardError = (message: string) => {
 };
 
 export default {
-  // eslint-disable-next-line max-len
-  async Add(data:ITimeFrame): Promise<ITimeFrame> {
+  async Add(timeFrame): Promise<ITimeFrame> {
     try {
-      // eslint-disable-next-line max-len
-      return await db.TimeFrames.create(1, data.driverId, data.customerName, data.town, data.timeFrame, data.orderDate);
+      return await db.TimeFrames.create(timeFrame);
     } catch (err) {
       standardError(`${err.name} ${err.message}`);
       throw repoErr;
@@ -43,6 +42,39 @@ export default {
   async GetAllTimeFrames(): Promise<ITimeFrame[]> {
     try {
       return await db.TimeFrames.findAll();
+    } catch (err) {
+      standardError(err.message);
+      return Promise.reject(repoErr);
+    }
+  },
+
+  async RemoveById(orderId: number): Promise<ITimeFrame[]> {
+    try {
+      return await db.TimeFrames.destroy({
+        where: { orderId },
+      });
+    } catch (err) {
+      standardError(`${err.name} ${err.message}`);
+      return Promise.reject(repoErr);
+    }
+  },
+
+  async GetByDriverIdAndDate(driverId: number, orderDate: Date): Promise<ITimeFrame[]> {
+    try {
+      return await db.TimeFrames.findAll({
+        where: {
+          [Op.and]: [
+            {
+              driverId,
+              orderDate,
+            },
+          ],
+        },
+        attributes: { exclude: ['storeId'] },
+        include: [{
+          model: db.Stores, attributes: ['storeName'],
+        }],
+      });
     } catch (err) {
       standardError(err.message);
       return Promise.reject(repoErr);

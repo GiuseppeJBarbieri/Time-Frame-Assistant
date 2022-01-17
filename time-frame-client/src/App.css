@@ -23,3 +23,7 @@
 .app{
     height: -webkit-fill-available;
 }
+/* Bootstrap Override for pagination page-link making it deeper in layout*/
+.page-item:last-child .page-link {
+    z-index: inherit !important;
+}

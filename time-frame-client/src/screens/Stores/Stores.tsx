@@ -28,9 +28,9 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
       
       axios.post(`${BASE_API_URL}stores`, _store, { withCredentials: true })
         .then((response) => {
-          setIsSaving(false);
           setStore({ storeId: 0, storeName: '', emailAddress: '' });
           getStores();
+          setIsSaving(false);
         })
         .catch((err) => {
           console.log(err);

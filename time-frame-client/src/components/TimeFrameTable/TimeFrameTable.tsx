@@ -12,26 +12,22 @@ import { Spinner } from 'react-bootstrap';
 import IDriver from '../../types/IDriver';
 import { Plus } from 'react-bootstrap-icons';
 import { AddTimeFrameModal } from '../AddTimeFrameModal/AddTimeFrameModal';
+import ITimeFrame from '../../types/ITimeFrame';
 
 interface TimeFrameTableProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> {
     data: IDriver[];
     isPending: boolean;
-    date: string;
+    selectedDate: string;
+    getTimeFrames: (driverId: number, orderDate: Date) => void;
+    timeFrameList: ITimeFrame[];
+    isComponentLoading: boolean;
 }
 
-export const productsGenerator = (quantity: number) => {
-    const items = [];
-    for (let i = 0; i < quantity; i++) {
-        items.push({ id: i, name: `Town name ${i}`, price: 2100 + i });
-    }
-    return items;
-};
+const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = (props) => {
 
-const defaultModalState = { selectedDriver: {}, modalVisible: false, selectedDate: '' };
-
-const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ history, data, isPending, date }) => {
-    const [modalState, setModalState] = useState<{ modalVisible: boolean, selectedDriver: IDriver, selectedDate: string }>(defaultModalState);
-
+    const [modalState, setModalState] = useState<{ modalVisible: boolean, selectedDriver: IDriver }>({ modalVisible: false, selectedDriver: {} });
+    const [selectedDriver, setSelectedDriver] = useState<IDriver>({});
+    
     const rankFormatter = (_: any, data: any, index: any) => {
         return (
             <div
@@ -44,9 +40,9 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
                 onClick={(e) => { e.stopPropagation() }}
             >
                 <div onClick={(e) => {
-                    setModalState({ modalVisible: true, selectedDriver: data, selectedDate: date });
-                }
-                }>
+                    setModalState({ modalVisible: true, selectedDriver: data });
+                }}
+                >
                     <Plus
                         style={{ fontSize: 20, color: 'white' }}
                     />
@@ -81,7 +77,7 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
     ];
     return (
         <div>
-            {isPending ?
+            {props.isPending ?
                 <div className='spinnerDiv' >
                     <ul>
                         <li key='1' style={{ listStyle: 'none' }}>
@@ -93,21 +89,28 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
                     </ul>
                 </div>
                 :
-                <div>
+                <div key='drivers'>
                     <hr />
+                    {/** Shows drivers */}
                     <BootstrapTable
-                        key='driversTbl'
-                        bootstrap4
                         keyField="driverId"
-                        data={data}
+                        bootstrap4
+                        data={props.data}
                         columns={columns}
                         classes="table table-dark table-condensed table-hover table-striped"
                         expandRow={{
                             onlyOneExpanding: true,
-                            renderer: row => (
-                                <ExpandedRow />
-
-                            )
+                            renderer: (row, index) => {
+                                return (
+                                    <ExpandedRow
+                                        key='expandRowKey'
+                                        data={{ driverId: row.driverId, orderDate: props.selectedDate }}
+                                        getTimeFrames={props.getTimeFrames}
+                                        timeFrameList={props.timeFrameList}
+                                        isPending={props.isComponentLoading}
+                                    />
+                                )
+                            }
                         }}
                         pagination={paginationFactory({ sizePerPage: 4 })}
                     />
@@ -117,22 +120,17 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = ({ histo
                 // if true then render this
                 modalState.modalVisible &&
                 <AddTimeFrameModal
-                    // onCloseSave={() => {
-                    //     // Event modal will come back with to notify parent they have to sync with the db
-                    //     // resync and close
-                    //     return setAddTFModalVisible(false);
-                    // }}
-                    driver={modalState.selectedDriver}
-                    selectedDate={date}
+                    modalState={modalState}
+                    getTimeFrames={props.getTimeFrames}
+                    selectedDate={props.selectedDate}
                     onClose={async () => {
-                        setModalState(defaultModalState);
+                        setModalState({ ...modalState, modalVisible: false });
                     }}
                 />
             }
+            
         </div >
     );
 };
 
 export const TimeFrameTable = withRouter(TimeFrameTableComponent);
-
-

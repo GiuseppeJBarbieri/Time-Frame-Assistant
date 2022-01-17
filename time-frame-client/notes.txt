@@ -1,0 +1,28 @@
+'/':
+GET - Retrieve all objects
+POST - Creating object
+PUT/PATCH - Update object by ID (can also give redundant data that wont change...)
+DELETE - Deletes object by ID
+
+'/:id':
+GET - Retrieves object by ID
+
+'/by<column_name>/:<column_name>':
+POST - Retrieves one or all object(s) where x = x, y = y, ...
+TODO
+1. Validate Inputs on front end
+Home Screen Functionality ---
+    1. Edit time frame?
+    2. Email Store
+    3. Email All Stores
+
+
+login fuction acting weird - check
+
+
+
+TODO
+1. Form validation
+2. Edit time frame
+3. Email Store
+4. Email all stores
