@@ -30,7 +30,6 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
         .then((response) => {
           setStore({ storeId: 0, storeName: '', emailAddress: '' });
           getStores();
-          setIsSaving(false);
         })
         .catch((err) => {
           console.log(err);
@@ -40,21 +39,24 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
   };
 
   const getStores = () => {
+    setIsSaving(true);
     setTimeout(() => {
       axios.get(`${BASE_API_URL}stores`, { withCredentials: true })
         .then((response) => {
           setStoreTableState({ data: response?.data?.payload, isPending: false });
+          setIsSaving(false);
         })
         .catch((err) => {
           console.log(err);
         });
     }, 400);
   };
+  
   const onStoreRemoved = (storeId: number) => {
+    setIsSaving(true);
     setTimeout(() => {
       axios.delete(`${BASE_API_URL}stores/${storeId}`, { withCredentials: true })
         .then((response) => {
-          setIsSaving(false);
           getStores();
         })
         .catch((err) => {
@@ -65,6 +67,7 @@ export const StoresLayout: FunctionComponent<StoresProps> = ({ history }) => {
   useEffect(() => {
     getStores();
   }, []);
+
   return (
     <section className="text-white main-section overflow-auto">
       <div style={{ padding: 20 }}>

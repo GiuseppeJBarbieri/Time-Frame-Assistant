@@ -6,7 +6,7 @@ import { Form, Button, Fade } from 'react-bootstrap';
 import { TimeFrameTable } from '../../components/TimeFrameTable/TimeFrameTable';
 import { BASE_API_URL } from '../../constants/API';
 import IDriver from '../../types/IDriver';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import axios from 'axios';
 import './Home.css';
 import ITimeFrame from '../../types/ITimeFrame';
@@ -27,29 +27,28 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
    * If a row is expanded, this will help refresh the nested table when the date is changed
    */
   const [lastSelectedDriver, setLastSelectedDriver] = useState(0);
-  /**
-   * TODO
-   * lastSelectedDriver and isComponentLoading
-   */
-  const [isComponentLoading, setIsComponentLoading] = useState(false);
+
+  const [isNestedTableLoading, setIsNestedTableLoading] = useState(false);
 
   const getTimeFrames = (driverId: number, orderDate: Date) => {
+    setIsNestedTableLoading(true);
     setTimeout(() => {
-      setIsComponentLoading(true);
       const payload = { orderDate: orderDate, driverId: driverId };
       setLastSelectedDriver(driverId);
       axios.post(`${BASE_API_URL}/timeFrames/ByOrderDate`, payload, { withCredentials: true })
         .then((response) => {
           setTimeFrameList(response?.data?.payload);
-          setIsComponentLoading(false);
+          setIsNestedTableLoading(false);
         })
         .catch((err) => {
           console.log(err);
+          setIsNestedTableLoading(false);
         });
     }, 400);
   };
 
   const getDrivers = () => {
+    setDriverTableState({ ...driverTableState, isPending: true });
     setTimeout(() => {
       axios.get(`${BASE_API_URL}drivers`, { withCredentials: true })
         .then((response) => {
@@ -57,13 +56,14 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
         })
         .catch((err) => {
           console.log(err);
+          setDriverTableState({ ...driverTableState, isPending: false });
         });
     }, 400);
   };
 
   useEffect(() => {
     getDrivers();
-  }, []);
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <section className="text-white main-section overflow-auto">
@@ -74,9 +74,9 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
             <Form.Control
               style={{ textAlign: 'center' }}
               type="date"
-              value={moment(selectedDate).format("YYYY-MM-DD")}
+              value={selectedDate}
               onChange={(e) => {
-                setSelectedDate(moment(e.target.value).toString());
+                setSelectedDate(moment(e.target.value).format("YYYY-MM-DD"));
                 getTimeFrames(lastSelectedDriver, new Date(moment(e.target.value).toString()));
               }}
             />
@@ -125,7 +125,7 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
             isPending={driverTableState.isPending}
             selectedDate={selectedDate}
             timeFrameList={timeFrameList}
-            isComponentLoading={isComponentLoading}
+            isNestedTableLoading={isNestedTableLoading}
             getTimeFrames={getTimeFrames}
           />
         </div>

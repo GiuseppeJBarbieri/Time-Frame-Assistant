@@ -6,7 +6,7 @@ interface ITimeFrame {
     town?: string;
     orderNumber?: string;
     timeFrame?: string;
-    orderDate?: Date;
+    orderDate: Date;
 }
 
 export default ITimeFrame;

@@ -12,49 +12,53 @@ import { Spinner } from 'react-bootstrap';
 
 import './ExpandedRow.css';
 import { EditTimeFrameModal } from '../EditTimeFrameModal/EditTimeFrameModal';
+import IDriver from '../../types/IDriver';
 
 interface ExpandedRowProps extends RouteComponentProps, HTMLAttributes<HTMLDivElement> {
-    data: { driverId: number, orderDate: string };
+    data: { driver: IDriver, orderDate: string };
     getTimeFrames: (driverId: number, orderDate: Date) => void;
     timeFrameList: ITimeFrame[];
-    isPending: boolean;
+    isNestedTableLoading: boolean;
 }
 
 const ExpandedRowComponent: FunctionComponent<ExpandedRowProps> = (props) => {
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState<ITimeFrame>({});
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState<ITimeFrame>({ orderDate: new Date() });
     const [selectedStoreName, setSelectedStoreName] = useState('');
-    const [editTimeFrameSwitch, setEditTimeFrameSwitch] = useState(true);
+    const [editTimeFrameSwitch, setEditTimeFrameSwitch] = useState(false);
 
     useEffect(() => {
-        props.getTimeFrames(props.data.driverId, new Date(props.data.orderDate));
-    }, []);
+        props.getTimeFrames(Number(props.data.driver.driverId), new Date(props.data.orderDate));
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const editTimeFrame = (timeFrame: ITimeFrame) => {
         setSelectedTimeFrame(timeFrame);
-        setEditTimeFrameSwitch(false);
     };
+
     const removeTimeFrame = (orderId: number) => {
         setTimeout(() => {
             axios.delete(`${BASE_API_URL}timeFrames/${orderId}`, { withCredentials: true })
                 .then((response) => {
-                    props.getTimeFrames(props.data.driverId, new Date(props.data.orderDate));
+                    props.getTimeFrames(Number(props.data.driver.driverId), new Date(props.data.orderDate));
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         }, 400);
     };
+
     const rankFormatterEdit = (_: any, data: any, index: any) => {
         return (
             <div style={{ textAlign: 'center', cursor: 'pointer', lineHeight: 'normal', }}
                 onClick={() => {
                     editTimeFrame(data);
                     setSelectedStoreName(data.Store.storeName);
+                    setEditTimeFrameSwitch(true);
                 }} >
                 <Pencil style={{ fontSize: 20, color: 'white' }} />
             </div>
         );
     };
+
     const rankFormatterRemove = (_: any, data: any, index: any) => {
         return (
             <div style={{ textAlign: 'center', cursor: 'pointer', lineHeight: 'normal', }} onClick={() => removeTimeFrame(data.orderId)} >
@@ -112,7 +116,7 @@ const ExpandedRowComponent: FunctionComponent<ExpandedRowProps> = (props) => {
 
     return (
         <div key='expandedRow' className='expandedTimeFrameRow'>
-            {props.isPending ?
+            {props.isNestedTableLoading ?
                 <div className='spinnerDiv' style={{ verticalAlign: 'middle' }} >
                     <ul>
                         <li style={{ listStyle: 'none' }}>
@@ -125,31 +129,33 @@ const ExpandedRowComponent: FunctionComponent<ExpandedRowProps> = (props) => {
                 </div>
                 :
                 <div>
-                    {editTimeFrameSwitch ?
-                        <div>
-                            <br /><br />
-                            <BootstrapTable
-                                keyField="timeFrames"
-                                bootstrap4
-                                data={props.timeFrameList}
-                                columns={columns}
-                                rowStyle={{ fontWeight: 300 }}
-                                classes="table table-dark  table-hover table-striped"
-                                pagination={paginationFactory({ sizePerPage: 5 })}
-                            />
-                        </div>
-                        :
-                        <div>
-                            <EditTimeFrameModal
-                                selectedTimeFrame={selectedTimeFrame}
-                                getTimeFrames={props.getTimeFrames}
-                                selectedStoreString={selectedStoreName}
-                                onClose={async () => {
-                                    setEditTimeFrameSwitch(true);
-                                }}
-                            />
-                        </div>
-                    }
+                    <div>
+                        <br /><br />
+                        <BootstrapTable
+                            keyField="Store.storeName"
+                            bootstrap4
+                            data={props.timeFrameList}
+                            columns={columns}
+                            rowStyle={{ fontWeight: 300 }}
+                            classes="table table-dark  table-hover table-striped"
+                            pagination={paginationFactory({ sizePerPage: 5 })}
+                        />
+                    </div>
+                </div>
+            }
+            {
+                editTimeFrameSwitch &&
+                <div>
+                    <EditTimeFrameModal
+                        isVisible={editTimeFrameSwitch}
+                        selectedTimeFrame={selectedTimeFrame}
+                        getTimeFrames={props.getTimeFrames}
+                        selectedStoreString={selectedStoreName}
+                        selectedDriver={props.data.driver}
+                        onClose={async () => {
+                            setEditTimeFrameSwitch(false);
+                        }}
+                    />
                 </div>
             }
         </div>

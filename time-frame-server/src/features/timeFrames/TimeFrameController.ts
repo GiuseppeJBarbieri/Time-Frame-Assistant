@@ -11,8 +11,6 @@ export default {
    * @returns {PromiseLike<>}
    */
 
-  // TODO THIS
-  // eslint-disable-next-line max-len
   async Add(timeFrame: ITimeFrame): Promise<IHTTPResponse> {
     try {
       let _timeFrame = { ...timeFrame };
@@ -73,6 +71,20 @@ export default {
       return {
         ...constants.HTTP.SUCCESS.DELETE,
         payload: affectedRowCount,
+      };
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  },
+
+  async Edit(timeFrame: ITimeFrame): Promise<IHTTPResponse> {
+    try {
+      let _timeFrame = { ...timeFrame };
+      _timeFrame = await TimeFrameRepository.Edit(_timeFrame);
+
+      return {
+        ...constants.HTTP.SUCCESS.UPDATE,
+        id: _timeFrame.orderId,
       };
     } catch (err) {
       return Promise.reject(err);

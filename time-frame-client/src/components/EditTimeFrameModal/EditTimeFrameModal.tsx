@@ -1,8 +1,10 @@
 import axios from "axios";
+import moment from "moment";
 import React, { HTMLAttributes, FunctionComponent, useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { BASE_API_URL } from "../../constants/API";
+import IDriver from "../../types/IDriver";
 
 import IStore from '../../types/IStore';
 import ITimeFrame from "../../types/ITimeFrame";
@@ -12,6 +14,8 @@ interface EditTimeFrameModalProps extends RouteComponentProps, HTMLAttributes<HT
     getTimeFrames: (driverId: number, orderDate: Date) => void;
     selectedStoreString: string;
     selectedTimeFrame: ITimeFrame;
+    selectedDriver: IDriver;
+    isVisible: boolean;
 }
 
 const EditTimeFrameModalComponent: FunctionComponent<EditTimeFrameModalProps> = (props) => {
@@ -38,7 +42,7 @@ const EditTimeFrameModalComponent: FunctionComponent<EditTimeFrameModalProps> = 
                 setStoreList(_storeList);
                 for (var i = 0; i < _storeList.length; i++) {
                     if (_storeList[i].storeName?.toLocaleLowerCase === props.selectedStoreString.toLocaleLowerCase) {
-                        setSelectedStore(i+1);
+                        setSelectedStore(i + 1);
                     }
                 }
             })
@@ -46,17 +50,29 @@ const EditTimeFrameModalComponent: FunctionComponent<EditTimeFrameModalProps> = 
                 console.log(err);
             });
 
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const editTimeFrame = async () => {
-
+        setIsSaving(true);
+        setTimeout(() => {
+            axios.put(`${BASE_API_URL}timeFrames`, editedTimeFrame, { withCredentials: true })
+                .then((response) => {
+                    props.getTimeFrames(Number(props.selectedDriver.driverId), props.selectedTimeFrame.orderDate);
+                    setIsSaving(false);
+                    props.onClose();
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setIsSaving(false);
+                });
+        }, 500);
     };
     return (
-        <Modal backdrop="static" show={true} onHide={props.onClose} className='bg-dark'>
+        <Modal backdrop="static" show={props.isVisible} onHide={props.onClose} className='bg-dark'>
             <Modal.Header closeButton>
                 <Modal.Title style={{ display: '' }}>
                     <h4 style={{ verticalAlign: '' }} >Editing Time Frame for </h4>
-                    <h4 style={{ fontWeight: 500, marginLeft: 5 }}></h4>
+                    <h4 style={{ fontWeight: 500, marginLeft: 5 }}>{props.selectedDriver.name} on {moment(props.selectedTimeFrame.orderDate).format("MM/DD/YYYY")}</h4>
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ color: 'red', fontSize: 18, fontWeight: 400 }}>
@@ -86,7 +102,7 @@ const EditTimeFrameModalComponent: FunctionComponent<EditTimeFrameModalProps> = 
                                 value={selectedStore}
                             >
                                 {storeList.map((store, i) => {
-                                    return <option value={i+1}>{store.storeName}</option>
+                                    return <option value={i + 1}>{store.storeName}</option>
                                 }
                                 )}
                             </select>
@@ -118,8 +134,16 @@ const EditTimeFrameModalComponent: FunctionComponent<EditTimeFrameModalProps> = 
                         <hr />
                         <Button variant="primary" onClick={async () => {
                             editTimeFrame();
-                            isSaving &&
-                            setEditedTimeFrame({ storeId: 0, customerName: '', town: '', orderNumber: '', timeFrame: '' });
+                            setEditedTimeFrame({
+                                orderId: 0,
+                                storeId: 0,
+                                driverId: 0,
+                                customerName: '',
+                                town: '',
+                                orderNumber: '',
+                                timeFrame: '',
+                                orderDate: new Date()
+                            });
                         }}>
                             Edit Time Frame
                         </Button>

@@ -18,6 +18,7 @@ interface AddTimeFrameModalProps extends RouteComponentProps, HTMLAttributes<HTM
 const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (props) => {
     const [storeList, setStoreList] = useState<IStore[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+    
     const [timeFrame, setTimeFrame] =
         useState<ITimeFrame>({
             orderId: 0,
@@ -29,6 +30,7 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (p
             timeFrame: '',
             orderDate: new Date(props.selectedDate)
         });
+    
 
     useEffect(() => {
         axios.get(`${BASE_API_URL}stores`, { withCredentials: true })
@@ -40,24 +42,29 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (p
             });
     }, []);
 
-    const addTimeFrame = async () => {
+    const addTimeFrame = async (close: boolean) => {
         setIsSaving(true);
         setTimeout(() => {
             // Trimming out store id b/c validation doesn't require
             const _timeFrame = { ...timeFrame };
             delete _timeFrame.orderId;
-
             axios.post(`${BASE_API_URL}timeFrames`, _timeFrame, { withCredentials: true })
                 .then((response) => {
-                    setIsSaving(false);
                     props.getTimeFrames(Number(props.modalState.selectedDriver.driverId), new Date(props.selectedDate));
                     setTimeFrame({
+                        orderId: 0,
                         storeId: 0,
+                        driverId: props.modalState.selectedDriver.driverId,
                         customerName: '',
                         town: '',
                         orderNumber: '',
-                        timeFrame: ''
+                        timeFrame: '',
+                        orderDate: new Date(props.selectedDate)
                     });
+                    setIsSaving(false);
+                    if(close) {
+                        props.onClose();
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -65,18 +72,19 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (p
                 });
         }, 400);
     };
+    
     return (
         <Modal backdrop="static" show={props.modalState.modalVisible} onHide={props.onClose} className='bg-dark'>
             <Modal.Header closeButton>
                 <Modal.Title style={{ display: '' }}>
                     <h4 style={{ verticalAlign: '' }} >Adding Time Frame for </h4>
                     <h4 style={{ fontWeight: 500, marginLeft: 5 }}>{props.modalState.selectedDriver.name} on {moment(props.selectedDate).format("MM/DD/YYYY")}</h4>
-                    
+
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body style={{ color: 'red', fontSize: 18, fontWeight: 400 }}>
                 Please enter time frame information.
-                Date: 
+                Date:
             </Modal.Body>
             <div className='container d-grid gap-2' style={{ marginBottom: 15 }}>
                 {isSaving ?
@@ -133,18 +141,13 @@ const AddTimeFrameModalComponent: FunctionComponent<AddTimeFrameModalProps> = (p
                         </Form.Group>
                         <br />
                         <Button variant="primary" onClick={async () => {
-                            addTimeFrame();
-                            isSaving &&
-                                setTimeFrame({ storeId: 0, customerName: '', town: '', orderNumber: '', timeFrame: '' });
+                            addTimeFrame(false);
                         }}>
                             Add Time Frame
                         </Button>
                         <hr />
                         <Button variant="primary" onClick={async () => {
-                            addTimeFrame();
-                            isSaving &&
-                                props.onClose();
-                            props.modalState.modalVisible = false;
+                            addTimeFrame(true);
                         }}>
                             Finish Time Frames
                         </Button>

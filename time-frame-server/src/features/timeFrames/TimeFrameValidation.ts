@@ -41,4 +41,17 @@ export default {
     },
   },
 
+  PutTimeFrame: {
+    body: {
+      orderId: Joi.number(),
+      storeId: Joi.number(),
+      driverId: Joi.number(),
+      customerName: Joi.string(),
+      town: Joi.string(),
+      orderNumber: Joi.string(),
+      timeFrame: Joi.string(),
+      orderDate: Joi.string(),
+    },
+  },
+
 };

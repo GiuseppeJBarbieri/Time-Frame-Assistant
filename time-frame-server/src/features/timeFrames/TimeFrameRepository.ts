@@ -81,4 +81,17 @@ export default {
     }
   },
 
+  async Edit(timeFrame): Promise<ITimeFrame> {
+    try {
+      return await db.TimeFrames.update(timeFrame, {
+        where: {
+          orderId: timeFrame.orderId,
+        },
+      });
+    } catch (err) {
+      standardError(`${err.name} ${err.message}`);
+      throw repoErr;
+    }
+  },
+
 };

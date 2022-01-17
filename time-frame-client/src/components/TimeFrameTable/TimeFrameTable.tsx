@@ -20,13 +20,12 @@ interface TimeFrameTableProps extends RouteComponentProps, HTMLAttributes<HTMLDi
     selectedDate: string;
     getTimeFrames: (driverId: number, orderDate: Date) => void;
     timeFrameList: ITimeFrame[];
-    isComponentLoading: boolean;
+    isNestedTableLoading: boolean;
 }
 
 const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = (props) => {
 
     const [modalState, setModalState] = useState<{ modalVisible: boolean, selectedDriver: IDriver }>({ modalVisible: false, selectedDriver: {} });
-    const [selectedDriver, setSelectedDriver] = useState<IDriver>({});
     
     const rankFormatter = (_: any, data: any, index: any) => {
         return (
@@ -104,10 +103,10 @@ const TimeFrameTableComponent: FunctionComponent<TimeFrameTableProps> = (props) 
                                 return (
                                     <ExpandedRow
                                         key='expandRowKey'
-                                        data={{ driverId: row.driverId, orderDate: props.selectedDate }}
+                                        data={{ driver: row, orderDate: props.selectedDate }}
                                         getTimeFrames={props.getTimeFrames}
                                         timeFrameList={props.timeFrameList}
-                                        isPending={props.isComponentLoading}
+                                        isNestedTableLoading={props.isNestedTableLoading}
                                     />
                                 )
                             }

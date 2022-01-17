@@ -72,4 +72,14 @@ router.delete('/:orderId',
       })
       .catch((err) => next(err));
   });
+
+router.put('/', authenticationMiddleware, validate(TimeFrameValidation.PutTimeFrame),
+  (req, res, next) => {
+    logger.info('PUT TimeFrame');
+    TimeFrameController.Edit(req.body)
+      .then((response) => {
+        res.status(201).json(response);
+      })
+      .catch((err) => next(err));
+  });
 export default router;

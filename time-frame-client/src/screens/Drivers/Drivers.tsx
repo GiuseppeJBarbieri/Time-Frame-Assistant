@@ -24,9 +24,8 @@ export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
       delete _driver.driverId;
       axios.post(`${BASE_API_URL}drivers`, _driver, { withCredentials: true })
         .then((response) => {
-          setIsSaving(false);
-          setDriver({ driverId: 0, name: '' });
           getDrivers();
+          setDriver({ driverId: 0, name: '' });
         })
         .catch((err) => {
           console.log(err);
@@ -39,8 +38,8 @@ export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
     setTimeout(() => {
       axios.get(`${BASE_API_URL}drivers`, { withCredentials: true })
         .then((response) => {
-          setIsSaving(false);
           setDriverTableState({ data: response?.data?.payload, isPending: false });
+          setIsSaving(false);
         })
         .catch((err) => {
           console.log(err);
@@ -49,11 +48,12 @@ export const DriversLayout: FunctionComponent<DriversProps> = ({ history }) => {
   };
 
   const onDriverRemoved = (driverId: number) => {
+    setIsSaving(true);
     setTimeout(() => {
       axios.delete(`${BASE_API_URL}drivers/${driverId}`, { withCredentials: true })
         .then((response) => {
-          setIsSaving(false);
           getDrivers();
+          setIsSaving(false);
         })
         .catch((err) => {
           console.log(err);
