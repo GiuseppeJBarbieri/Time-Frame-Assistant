@@ -3,6 +3,7 @@ interface IHTTPResponse {
     message?: string
     ip?: string
     id?: number
+    payload?: any[]
 }
 
 export default IHTTPResponse;

@@ -1,0 +1,12 @@
+<form ref={form} onSubmit={sendEmail}>
+      <label>Name</label>
+      <input type="text" name="user_name" />
+      <label>Email</label>
+      <input type="text" name="user_email" />
+      <label>Message</label>
+      <input name="message" />
+      <input type="submit" onClick="(function(e){
+        console.log(e);
+        return false;
+    })();return false;" value="Send" />
+</form>

@@ -50,13 +50,14 @@ router.get('/:orderId', authenticationMiddleware, validate(TimeFrameValidation.G
  * This route will fetch all time frames based on driverId and orderDate
  */
 // eslint-disable-next-line max-len
-router.post('/ByOrderDate', authenticationMiddleware, validate(TimeFrameValidation.GetTimeFramesByOrderDate), (req, res, next) => {
-  const { driverId, orderDate } = req.body;
-  logger.info('GET ALL TIME FRAMES BY DATE & DRIVER ID', orderDate);
-  TimeFrameController.GetByDateAndDriver(driverId, orderDate)
-    .then((stores) => res.status(200).json(stores))
-    .catch((err) => next(err));
-});
+router.post('/ByOrderDate', authenticationMiddleware,
+  validate(TimeFrameValidation.GetTimeFramesByOrderDate), (req, res, next) => {
+    const { driverId, orderDate } = req.body;
+    logger.info('GET ALL TIME FRAMES BY DATE & DRIVER ID', orderDate);
+    TimeFrameController.GetByDateAndDriver(driverId, orderDate)
+      .then((stores) => res.status(200).json(stores))
+      .catch((err) => next(err));
+  });
 
 /**
  * This route will delete a time frame by id

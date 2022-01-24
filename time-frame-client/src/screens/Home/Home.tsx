@@ -47,6 +47,9 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
     }, 400);
   };
 
+  const showEmailScreen = () => {
+
+  }
   const getDrivers = () => {
     setDriverTableState({ ...driverTableState, isPending: true });
     setTimeout(() => {
@@ -100,9 +103,10 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
               <Button
                 style={{ marginLeft: 10 }}
                 className='btn btn-dark'
-                onClick={() => setOpenEmailBtns(!openEmailBtns)}
-                aria-controls="collapse-btns"
-                aria-expanded={openEmailBtns}
+                onClick={() => {
+                  showEmailScreen();
+                  setOpenEmailBtns(!openEmailBtns);
+                }}
               >
                 Store
               </Button>
@@ -110,8 +114,7 @@ export const HomeLayout: FunctionComponent<HomeProps> = ({ history }) => {
                 style={{ marginLeft: 10 }}
                 className='btn btn-dark'
                 onClick={() => setOpenEmailBtns(!openEmailBtns)}
-                aria-controls="collapse-btns"
-                aria-expanded={openEmailBtns}
+
               >
                 All Stores
               </Button>

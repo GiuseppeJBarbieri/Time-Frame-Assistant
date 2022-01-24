@@ -30,7 +30,7 @@ router.post('/', authenticationMiddleware, validate(DriverValidation.PostDriver)
 router.get('/:driverId', authenticationMiddleware, validate(DriverValidation.GetDriver), (req, res, next) => {
   logger.info('GET Driver');
 
-  DriverController.GetById(Number(req.params.id))
+  DriverController.GetById(Number(req.params.driverId))
     .then((driver) => res.status(200).json(driver))
     .catch((err) => next(err));
 });
